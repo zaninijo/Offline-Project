@@ -1,15 +1,33 @@
-import { Stack } from "expo-router";
-import { TrackedAppsStorageProvider } from "@/contexts/trackedAppsStorage";
-import { StatsStorageProvider } from "@/contexts/statsStorage";
+import { Text } from 'react-native';
+import React, { useEffect } from 'react';
+import { useAuth, AuthProvider } from '@/context/auth';
+import { useRouter, Slot } from 'expo-router';
 
-export default function RootLayout() {
+const AuthWait = ({ children }: { children: React.ReactNode }) => {
+  const authContext = useAuth();
+
+  const {initializing, user} = authContext
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      router.replace('/app');
+    } else {
+      router.replace('/auth');
+    }
+  }, [user, initializing]);
+
+  if (initializing) return (<Text>INICIALIZANDO</Text>);
+
+  return (<>{children}</>);
+};
+
+export default function Layout() {
   return (
-    <TrackedAppsStorageProvider>
-      <StatsStorageProvider>
-        <Stack>
-          <Stack.Screen name="index" />
-        </Stack>
-      </StatsStorageProvider>
-    </TrackedAppsStorageProvider>
-  );
+    <AuthProvider>
+      <AuthWait>
+        <Slot />
+      </AuthWait>
+    </AuthProvider>
+  )
 }

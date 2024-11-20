@@ -1,7 +1,7 @@
 import { NativeModules } from 'react-native';
 import { useState } from 'react'
 const { UsageStatsModule } = NativeModules;
-import { AppInfo, Stat, RawStat } from '@/utils/types'
+import { AppInfo, Stat, RawStat } from '@/types/types'
 
 
 export async function fecthUsageStats(startTime: number, endTime: number, filterFunc?: (packageName: string) => boolean) {

@@ -1,19 +1,15 @@
 import { createContext, useState, useContext, FC, ReactNode, useEffect} from 'react'
-import { Stat, AppInfo, RawStat } from '@/utils/types'
+import { Stat, AppInfo, RawStat } from '@/types/types'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-  /*  Esse código pode estar um pouco confuso, os nomes de propriedades que eu dei são talvez um pouco
-    contraintuitivos. Stat é um novo tipo que eu fiz para mergir os outros dois tipos anteriores,
-    o UsageStat e o AppInfo. Eu fiz isso porque não queria mexer no códigos e tipos antigos.
-    Dentro desse módulo, as informações de uso são do tipo Stat. */
-
 
 const usageStatsContext = createContext<{
   statsStorage: Stat[],
   updateStatsStorage: (stat: Stat[]) => Promise<void>,
+  flushStatsStorage: () => Promise<void>
 } | null >(null);
 
 export const StatsStorageProvider: FC<{ children: ReactNode }> = ({ children }) => {
+  
   const [statsStorage, setStatStorage] = useState<Stat[]>([]);
   const STORAGE_KEY = '@storage_Stats';
 
@@ -21,7 +17,7 @@ export const StatsStorageProvider: FC<{ children: ReactNode }> = ({ children }) 
     const loadStats = async () => {
       try {
         const storedStat = await AsyncStorage.getItem(STORAGE_KEY);
-        if (storedStat !== null) {
+        if (storedStat) {
           const parsedData: Stat[] = JSON.parse(storedStat);
           setStatStorage(parsedData);
         }
@@ -29,7 +25,7 @@ export const StatsStorageProvider: FC<{ children: ReactNode }> = ({ children }) 
         console.error(error)
       }
     };
-
+    
     loadStats()
   },[])
 
@@ -58,12 +54,13 @@ export const StatsStorageProvider: FC<{ children: ReactNode }> = ({ children }) 
     }
   }
 
-  const flushStatsStorage = async () => {
-    // depois adiciono
+  const flushStatsStorage = async () => { // função de teste só pra deletar todos os dados
+    await AsyncStorage.setItem(STORAGE_KEY, "")
+    setStatStorage([])
   }
 
   return (
-    <usageStatsContext.Provider value={{ statsStorage, updateStatsStorage: updateStatsStorage }}>
+    <usageStatsContext.Provider value={{ statsStorage, updateStatsStorage, flushStatsStorage }}>
       {children} 
     </usageStatsContext.Provider>
   );

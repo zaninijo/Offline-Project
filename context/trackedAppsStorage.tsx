@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, FC, ReactNode, useEffect} from 'react'
-import { AppInfo } from '@/utils/types'
+import { AppInfo } from '@/types/types'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const trackedAppsContext = createContext<{
