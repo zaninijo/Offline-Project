@@ -2,6 +2,7 @@ import { NativeModules } from 'react-native';
 import { useState } from 'react'
 const { UsageStatsModule } = NativeModules;
 import { AppInfo, Stat, RawStat } from '@/types/types'
+import { generateAccent } from '@/theme';
 
 
 export async function fecthUsageStats(startTime: number, endTime: number, filterFunc?: (packageName: string) => boolean) {
@@ -75,10 +76,17 @@ export async function formatStats(usageEntries: RawStat[]|null, findInTrackedApp
                 appName: appInfo.appName,
                 timeSpan: spanData,
                 appIcon: appInfo.icon,
-                activity: activityData
+                activity: activityData,
+                color: '#FFFFFF'
             };
 
             formatedStats.push(newStat);
+        })
+
+        const colors = generateAccent(formatedStats.length)
+        formatedStats = formatedStats.map((entry, i) => {
+            entry.color = colors[i]
+            return entry
         })
     }
     catch (err) {

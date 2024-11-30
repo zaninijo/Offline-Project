@@ -24,6 +24,7 @@ const AuthWait = ({ children }: { children: React.ReactNode }) => {
 
 export default function Layout() {
   return (
+
     <AuthProvider>
       <AuthWait>
         <Slot />

@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, FC, ReactNode, useEffect} from 'react'
+import { createContext, useState, useContext, FC, ReactNode, useEffect } from 'react'
 import { Stat, AppInfo, RawStat } from '@/types/types'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -6,10 +6,10 @@ const usageStatsContext = createContext<{
   statsStorage: Stat[],
   updateStatsStorage: (stat: Stat[]) => Promise<void>,
   flushStatsStorage: () => Promise<void>
-} | null >(null);
+} | null>(null);
 
 export const StatsStorageProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  
+
   const [statsStorage, setStatStorage] = useState<Stat[]>([]);
   const STORAGE_KEY = '@storage_Stats';
 
@@ -25,18 +25,18 @@ export const StatsStorageProvider: FC<{ children: ReactNode }> = ({ children }) 
         console.error(error)
       }
     };
-    
+
     loadStats()
-  },[])
+  }, [])
 
   const updateStatsStorage = async (statArray: Stat[]) => {
     try {
       let updatedStorage = [...statsStorage]
       statArray.forEach(stat => {
         const repeatedPackage = updatedStorage.find(storagedStat => storagedStat.packageName === stat.packageName)
-        const isOutsideTimeSpan =  repeatedPackage && (repeatedPackage.timeSpan.end < stat.timeSpan.end || repeatedPackage.timeSpan.start > stat.timeSpan.start)
-        
-        if ( repeatedPackage && isOutsideTimeSpan && stat.timeSpan.start ) { // É necessário verificar se o timeSpan.start != 0 (as vezes acontece)
+        const isOutsideTimeSpan = repeatedPackage && (repeatedPackage.timeSpan.end < stat.timeSpan.end || repeatedPackage.timeSpan.start > stat.timeSpan.start)
+
+        if (repeatedPackage && isOutsideTimeSpan && stat.timeSpan.start) { // É necessário verificar se o timeSpan.start != 0 (as vezes acontece)
           const activityUpdate = stat.activity.concat(repeatedPackage.activity); // Juntar os arrays
           stat.activity = [...new Set(activityUpdate)];  // Remover duplicados
           updatedStorage = updatedStorage.filter(storagedStat => storagedStat.packageName !== stat.packageName); // Remove antigo
@@ -48,7 +48,7 @@ export const StatsStorageProvider: FC<{ children: ReactNode }> = ({ children }) 
       })
       setStatStorage(updatedStorage);
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedStorage));
-      
+
     } catch (error) {
       console.error(error)
     }
@@ -61,7 +61,7 @@ export const StatsStorageProvider: FC<{ children: ReactNode }> = ({ children }) 
 
   return (
     <usageStatsContext.Provider value={{ statsStorage, updateStatsStorage, flushStatsStorage }}>
-      {children} 
+      {children}
     </usageStatsContext.Provider>
   );
 };

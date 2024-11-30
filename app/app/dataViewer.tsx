@@ -2,13 +2,18 @@ import { View, Text, Button, TextInput, FlatList, StyleSheet } from 'react-nativ
 import React, { useEffect, useState } from 'react'
 import RNPickerSelect from 'react-native-picker-select';
 import { time } from '@/util/timeDict';
+import { useStatsStorageContext } from '@/context/statsStorage';
 
 export default () => {
+
+  const { statsStorage } = useStatsStorageContext()
+
   const [granularity, setGranularity] = useState<string>('daily')
   const [interval, setInterval] = useState<number>(1)
   const [minInterval, setMinInterval] = useState<number>(1)
   const [maxInterval, setMaxInterval] = useState<number>(7)
   const [multiplier, setMultiplier] = useState<number>(time.day)
+  const [widgets, setWidgets] = useState<string[]>([])
   
   const granularityOptions = [
     { label: 'Diário', value: 'daily' },
@@ -32,13 +37,18 @@ export default () => {
         setMinInterval(1); setMaxInterval(5); setMultiplier(time.year); break;
       }
     }
-    setInterval(1)
-  }, [granularity])
+    setInterval(1);
+  }, [granularity]);
 
   const intervalOptions = Array.from({ length: maxInterval }, (_, index) => ({
     label: `${index + minInterval} unidade(s)`,
     value: index + minInterval,
   }));
+
+  const generateView = (periodStart: number) => {
+    // filtrar dados
+    
+  }
 
   return (
     <View>
@@ -56,6 +66,7 @@ export default () => {
         onValueChange={(value) => setInterval(value)}
         value={interval}
       />
+      <Button title='Gerar'></Button>
     </View>
   )
 }
